@@ -22,7 +22,7 @@ void initTimers();
 
 void initWifiAP() {
 	//Serial.println("Setting up WiFi AP...");
-	if (WiFi.softAP("bbot", "12345678")) {
+	if (WiFi.softAP("Zowxi", "12345678")) {
 		Serial.println("Wifi AP set up successfully");
 	}
 	WiFi.softAPConfig(IPAddress(192, 168, 4, 1), IPAddress(192, 168, 4, 1),
@@ -33,9 +33,46 @@ void initMPU6050() {
 	MPU6050_setup();
 	delay(500);
 	MPU6050_calibrate();
+	Serial.println("MPU6050 initialized done");
+	digitalWrite(PIN_BUZZER, HIGH);
+	delay(180);
+	digitalWrite(PIN_BUZZER, LOW);
+	delay(20);
+	digitalWrite(PIN_BUZZER, HIGH);
+	delay(60);
+	digitalWrite(PIN_BUZZER, LOW);
+	delay(20);
+	digitalWrite(PIN_BUZZER, HIGH);
+	delay(60);
+	digitalWrite(PIN_BUZZER, LOW);
+	delay(20);
+	digitalWrite(PIN_BUZZER, HIGH);
+	delay(60);
+	digitalWrite(PIN_BUZZER, LOW);
+	delay(100);
+}
+
+void playStartupTune() {
+  // Nada dan durasi (frekuensi dalam Hz, durasi dalam milidetik)
+  tone(PIN_BUZZER, 500); // Bunyi rendah
+  delay(200);
+  noTone(PIN_BUZZER); // Hentikan bunyi
+  delay(100);        // Jeda
+
+  tone(PIN_BUZZER, 1000); // Bunyi sedang
+  delay(200);
+  noTone(PIN_BUZZER);
+  delay(100);
+
+  tone(PIN_BUZZER, 1500); // Bunyi tinggi
+  delay(300);
+  noTone(PIN_BUZZER);
 }
 
 void setup() {
+	pinMode(PIN_BUZZER, OUTPUT);
+	playStartupTune();
+
 	pinMode(PIN_ENABLE_MOTORS, OUTPUT);
 	digitalWrite(PIN_ENABLE_MOTORS, HIGH);
 

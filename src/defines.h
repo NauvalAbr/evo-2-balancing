@@ -9,14 +9,16 @@
 #define DEFINES_H_
 
 #define PIN_ENABLE_MOTORS 16
-
-#define PIN_SERVO 13
-
 #define PIN_MOTOR1_DIR 18
 #define PIN_MOTOR1_STEP 19
 
 #define PIN_MOTOR2_DIR 15
 #define PIN_MOTOR2_STEP 4
+
+#define PIN_SERVO 13
+
+#define PIN_BUZZER 33
+#define PIN_LED 32
 
 #define TELEMETRY "192.168.4.1" // Default telemetry server (first client) port 2223
 
