@@ -81,10 +81,16 @@ void setup() {
 	pinMode(PIN_MOTOR2_DIR, OUTPUT);
 	pinMode(PIN_MOTOR2_STEP, OUTPUT);
 
-	pinMode(PIN_SERVO, OUTPUT);
+	pinMode(PIN_SERVO1, OUTPUT);
+	pinMode(PIN_SERVO2, OUTPUT);
+	pinMode(PIN_LED, OUTPUT);
 
 	ledcSetup(6, 50, 16); // channel 6, 50 Hz, 16-bit width
-	ledcAttachPin(PIN_SERVO, 6);   // GPIO 22 assigned to channel 1
+	ledcAttachPin(PIN_SERVO1, 6);   // GPIO 22 assigned to channel 1
+
+	ledcSetup(7, 50, 16); // channel 7, 50 Hz, 16-bit width
+	ledcAttachPin(PIN_SERVO2, 7);   // GPIO 23 assigned to channel 2
+
 	delay(50);
 	ledcWrite(6, SERVO_AUX_NEUTRO);
 
@@ -345,17 +351,23 @@ void loop() {
 			steering = 0;
 		}
 		// Push1 Move servo arm
-		if (OSCpush[0])  // Move arm
-		{
-			if (angle_adjusted > -40)
-				ledcWrite(6, SERVO_MIN_PULSEWIDTH);
-			else
-				ledcWrite(6, SERVO_MAX_PULSEWIDTH);
-		} else
-			ledcWrite(6, SERVO_AUX_NEUTRO);
+		if (OSCtoggle[0]==1){  // Move arm
+		ledcWrite(6, SERVO_MIN_PULSEWIDTH);
+		} else if (OSCtoggle[0]==0) {  // Return to neutral position
+		ledcWrite(6, SERVO_AUX_NEUTRO);
+		}
 
-		// Servo2
-		//ledcWrite(6, SERVO2_NEUTRO + (OSCfader[2] - 0.5) * SERVO2_RANGE);
+		//led
+		if (OSCpush[0]==1) {
+			digitalWrite(PIN_BUZZER, HIGH);
+			digitalWrite(PIN_LED, HIGH);
+		} else if (OSCpush[0]==0) {
+			digitalWrite(PIN_BUZZER, LOW);
+			digitalWrite(PIN_LED, LOW);
+		}
+
+		ledcWrite(7, SERVO2_LEFT + (OSCfader[2] - 0.5) * SERVO2_RIGHT);
+
 
 		// Normal condition?
 		if ((angle_adjusted < 56) && (angle_adjusted > -56)) {
@@ -407,4 +419,4 @@ void loop() {
 		}
 #endif
 	}  // End of slow loop
-}
+} // End of loop

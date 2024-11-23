@@ -9,13 +9,14 @@
 #define DEFINES_H_
 
 #define PIN_ENABLE_MOTORS 16
-#define PIN_MOTOR1_DIR 18
-#define PIN_MOTOR1_STEP 19
+#define PIN_MOTOR1_DIR 15
+#define PIN_MOTOR1_STEP 4
 
-#define PIN_MOTOR2_DIR 15
-#define PIN_MOTOR2_STEP 4
+#define PIN_MOTOR2_DIR 18
+#define PIN_MOTOR2_STEP 19
 
-#define PIN_SERVO 13
+#define PIN_SERVO1 13
+#define PIN_SERVO2 14
 
 #define PIN_BUZZER 33
 #define PIN_LED 32
@@ -54,12 +55,13 @@
 #define ANGLE_OFFSET 0.0  // Offset angle for balance (to compensate robot own weight distribution)
 
 // Servo definitions
-#define SERVO_AUX_NEUTRO 4444  // Servo neutral position
-#define SERVO_MIN_PULSEWIDTH SERVO_AUX_NEUTRO + 3000
-#define SERVO_MAX_PULSEWIDTH SERVO_AUX_NEUTRO - 3000
+#define SERVO_AUX_NEUTRO 6000  // Servo neutral position
+#define SERVO_MIN_PULSEWIDTH 7450
+#define SERVO_MAX_PULSEWIDTH 3000
 
-#define SERVO2_NEUTRO 4444
-#define SERVO2_RANGE 8400
+#define SERVO2_NEUTRO 6500
+#define SERVO2_LEFT 6000
+#define SERVO2_RIGHT 7000
 
 // Telemetry
 #define TELEMETRY_BATTERY 0
