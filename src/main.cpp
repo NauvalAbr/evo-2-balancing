@@ -21,8 +21,8 @@
 void initTimers();
 
 void initWifiAP() {
-	//Serial.println("Setting up WiFi AP...");
-	if (WiFi.softAP("Zowxi", "12345678")) {
+	Serial.println("Setting up WiFi AP...");
+	if (WiFi.softAP("SetBot", "12345678")) {
 		Serial.println("Wifi AP set up successfully");
 	}
 	WiFi.softAPConfig(IPAddress(192, 168, 4, 1), IPAddress(192, 168, 4, 1),
@@ -34,6 +34,7 @@ void initMPU6050() {
 	delay(500);
 	MPU6050_calibrate();
 	Serial.println("MPU6050 initialized done");
+	//buzzer aktif
 	digitalWrite(PIN_BUZZER, HIGH);
 	delay(180);
 	digitalWrite(PIN_BUZZER, LOW);
@@ -49,71 +50,71 @@ void initMPU6050() {
 	digitalWrite(PIN_BUZZER, HIGH);
 	delay(60);
 	digitalWrite(PIN_BUZZER, LOW);
-	delay(100);
 }
 
 void playStartupTune() {
-  // Nada dan durasi (frekuensi dalam Hz, durasi dalam milidetik)
-  tone(PIN_BUZZER, 500); // Bunyi rendah
+  digitalWrite(PIN_BUZZER, HIGH); // Bunyi rendah
   delay(200);
-  noTone(PIN_BUZZER); // Hentikan bunyi
+  digitalWrite(PIN_BUZZER, LOW); // Hentikan bunyi
   delay(100);        // Jeda
-
-  tone(PIN_BUZZER, 1000); // Bunyi sedang
+  digitalWrite(PIN_BUZZER, HIGH); // Bunyi rendah
   delay(200);
-  noTone(PIN_BUZZER);
-  delay(100);
-
-  tone(PIN_BUZZER, 1500); // Bunyi tinggi
+  digitalWrite(PIN_BUZZER, LOW); // Hentikan bunyi
+  delay(100);        // Jeda
+  digitalWrite(PIN_BUZZER, HIGH); // Bunyi tinggi
   delay(300);
-  noTone(PIN_BUZZER);
+  digitalWrite(PIN_BUZZER, LOW); // Hentikan bunyi
 }
 
+// ---------------------------------------------------------------------------------------
+//                                     SETUP
+//----------------------------------------------------------------------------------------
+
+
 void setup() {
+	//buzzer aktif
 	pinMode(PIN_BUZZER, OUTPUT);
 	playStartupTune();
 
+	//motor setup
 	pinMode(PIN_ENABLE_MOTORS, OUTPUT);
 	digitalWrite(PIN_ENABLE_MOTORS, HIGH);
-
 	pinMode(PIN_MOTOR1_DIR, OUTPUT);
 	pinMode(PIN_MOTOR1_STEP, OUTPUT);
 	pinMode(PIN_MOTOR2_DIR, OUTPUT);
 	pinMode(PIN_MOTOR2_STEP, OUTPUT);
 
+	//servo setup
 	pinMode(PIN_SERVO1, OUTPUT);
 	pinMode(PIN_SERVO2, OUTPUT);
 	pinMode(PIN_LED, OUTPUT);
-
+	//servo arm
 	ledcSetup(6, 50, 16); // channel 6, 50 Hz, 16-bit width
 	ledcAttachPin(PIN_SERVO1, 6);   // GPIO 22 assigned to channel 1
-
+	//servo gripper
 	ledcSetup(7, 50, 16); // channel 7, 50 Hz, 16-bit width
 	ledcAttachPin(PIN_SERVO2, 7);   // GPIO 23 assigned to channel 2
-
 	delay(50);
 	ledcWrite(6, SERVO_AUX_NEUTRO);
 
 	Serial.begin(115200);
 
 	Wire.begin();
-
 	initWifiAP();
-
 	initMPU6050();
 	initTimers();
-
 	OSC_init();
 
 	digitalWrite(PIN_ENABLE_MOTORS, LOW);
+
 	for (uint8_t k = 0; k < 5; k++) {
 		setMotorSpeedM1(5);
 		setMotorSpeedM2(5);
-		ledcWrite(6, SERVO_AUX_NEUTRO + 250);
+		// ledcWrite(6, SERVO_AUX_NEUTRO + 250);
 		delay(200);
 		setMotorSpeedM1(-5);
 		setMotorSpeedM2(-5);
-		ledcWrite(6, SERVO_AUX_NEUTRO - 250);
+		// ledcWrite(6, SERVO_AUX_NEUTRO - 250);
 		delay(200);
 	}
 	ledcWrite(6, SERVO_AUX_NEUTRO);
@@ -177,7 +178,7 @@ void processOSCMsg() {
 			OSCtoggle[0] = 0;
 
 			modifing_control_parameters = true;
-			OSC_MsgSend("$P2", 4);
+			// OSC_MsgSend("$P2", 4);
 		}
 		// User could adjust KP, KD, KP_THROTTLE and KI_THROTTLE (fadder1,2,3,4)
 		// Now we need to adjust all the parameters all the times because we dont know what parameter has been moved
@@ -203,25 +204,30 @@ void processOSCMsg() {
 		Serial.println(Ki_thr_user);
 #endif
 
-		// Calibration mode??
-		if (OSCpush[2] == 1) {
-			Serial.print("Calibration MODE ");
-			angle_offset = angle_adjusted_filtered;
-			Serial.println(angle_offset);
-		}
+		// // Calibration mode??
+		// if (OSCpush[2] == 1) {
+		// 	Serial.print("Calibration MODE ");
+		// 	angle_offset = angle_adjusted_filtered;
+		// 	Serial.println(angle_offset);
+		// }
 
-		// Kill robot => Sleep
-		while (OSCtoggle[0] == 1) {
-			//Reset external parameters
-			PID_errorSum = 0;
-			timer_old = millis();
-			setMotorSpeedM1(0);
-			setMotorSpeedM2(0);
-			digitalWrite(PIN_ENABLE_MOTORS, HIGH);  // Disable motors
-			OSC_MsgRead();
-		}
+		// // Kill robot => Sleep
+		// while (OSCtoggle[0] == 1) {
+		// 	//Reset external parameters
+		// 	PID_errorSum = 0;
+		// 	timer_old = millis();
+		// 	setMotorSpeedM1(0);
+		// 	setMotorSpeedM2(0);
+		// 	digitalWrite(PIN_ENABLE_MOTORS, HIGH);  // Disable motors
+		// 	OSC_MsgRead();
+		// }
 	}
 }
+
+// ---------------------------------------------------------------------------------------
+//                                     LOOP
+//----------------------------------------------------------------------------------------
+
 
 void loop() {
 	OSC_MsgRead();
@@ -255,11 +261,25 @@ void loop() {
 		Serial.print(angle_offset);
 		Serial.print(" ");
 		Serial.print(angle_adjusted);
-		Serial.print(",");
+		Serial.print(", ");
 		Serial.println(angle_adjusted_filtered);
 #endif
-		//Serial.print("\t");
 
+#if DEBUG==2
+				Serial.print(angle_adjusted);
+				Serial.print(" ");
+				Serial.println(estimated_speed_filtered);
+#endif
+
+#if DEBUG==3
+		Serial.print(angle_adjusted);
+		Serial.print(" ");
+		Serial.print(estimated_speed_filtered);
+		Serial.print(" ");
+		Serial.println(target_angle);
+#endif
+		
+		//Serial.print("\t");
 		// We calculate the estimated robot speed:
 		// Estimated_Speed = angular_velocity_of_stepper_motors(combined) - angular_velocity_of_robot(angle measured by IMU)
 		actual_robot_speed = (speed_M1 + speed_M2) / 2; // Positive: forward
@@ -268,12 +288,6 @@ void loop() {
 		int16_t estimated_speed = -actual_robot_speed + angular_velocity;
 		estimated_speed_filtered = estimated_speed_filtered * 0.9
 				+ (float) estimated_speed * 0.1; // low pass filter on estimated speed
-
-#if DEBUG==2
-				Serial.print(angle_adjusted);
-				Serial.print(" ");
-				Serial.println(estimated_speed_filtered);
-#endif
 
 		if (positionControlMode) {
 			// POSITION CONTROL. INPUT: Target steps for each motor. Output: motors speed
@@ -296,14 +310,6 @@ void loop() {
 		target_angle = constrain(target_angle, -max_target_angle,
 				max_target_angle); // limited output
 
-#if DEBUG==3
-		Serial.print(angle_adjusted);
-		Serial.print(" ");
-		Serial.print(estimated_speed_filtered);
-		Serial.print(" ");
-		Serial.println(target_angle);
-#endif
-
 		// Stability control (100Hz loop): This is a PD controller.
 		//    input: robot target angle(from SPEED CONTROL), variable: robot angle, output: Motor speed
 		//    We integrate the output (sumatory), so the output is really the motor acceleration, not motor speed.
@@ -320,11 +326,7 @@ void loop() {
 		motor1 = constrain(motor1, -MAX_CONTROL_OUTPUT, MAX_CONTROL_OUTPUT);
 		motor2 = constrain(motor2, -MAX_CONTROL_OUTPUT, MAX_CONTROL_OUTPUT);
 
-		int angle_ready;
-		if (OSCpush[0])     // If we press the SERVO button we start to move
-			angle_ready = 82;
-		else
-			angle_ready = 74;  // Default angle
+		int angle_ready = 46;
 		if ((angle_adjusted < angle_ready) && (angle_adjusted > -angle_ready)) // Is robot ready (upright?)
 				{
 			// NORMAL MODE
@@ -332,7 +334,7 @@ void loop() {
 			// NOW we send the commands to the motors
 			setMotorSpeedM1(motor1);
 			setMotorSpeedM2(motor2);
-		} else   // Robot not ready (flat), angle > angle_ready => ROBOT OFF
+		} else   // Robot not ready (fall), angle > angle_ready => ROBOT OFF
 		{
 			digitalWrite(PIN_ENABLE_MOTORS, HIGH);  // Disable motors
 			setMotorSpeedM1(0);
@@ -384,39 +386,4 @@ void loop() {
 		}
 
 	} // End of new IMU data
-
-	// Medium loop 7.5Hz
-	if (loop_counter >= 15) {
-		loop_counter = 0;
-		// Telemetry here?
-#if TELEMETRY_ANGLE==1
-		char auxS[25];
-		int ang_out = constrain(int(angle_adjusted * 10), -900, 900);
-		sprintf(auxS, "$tA,%+04d", ang_out);
-		OSC_MsgSend(auxS, 25);
-#endif
-#if TELEMETRY_DEBUG==1
-		char auxS[50];
-		sprintf(auxS, "$tD,%d,%d,%ld", int(angle_adjusted * 10), int(estimated_speed_filtered), steps1);
-		OSC_MsgSend(auxS, 50);
-#endif
-
-	} // End of medium loop
-	else if (slow_loop_counter >= 100) // 1Hz
-			{
-		slow_loop_counter = 0;
-		// Read  status
-#if TELEMETRY_BATTERY==1
-		BatteryValue = (BatteryValue + BROBOT_readBattery(false)) / 2;
-		sendBattery_counter++;
-		if (sendBattery_counter >= 3) { //Every 3 seconds we send a message
-			sendBattery_counter = 0;
-			Serial.print("B");
-			Serial.println(BatteryValue);
-			char auxS[25];
-			sprintf(auxS, "$tB,%04d", BatteryValue);
-			OSC_MsgSend(auxS, 25);
-		}
-#endif
-	}  // End of slow loop
 } // End of loop
