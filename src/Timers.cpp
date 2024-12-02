@@ -1,9 +1,3 @@
-/*
- * Timers.c
- *
- *  Created on: 24.09.2017
- *      Author: anonymous
- */
 #include <Arduino.h>
 #include <esp32-hal-timer.h>
 #include "globals.h"

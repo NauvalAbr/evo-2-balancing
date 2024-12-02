@@ -22,7 +22,7 @@ void initTimers();
 
 void initWifiAP() {
 	Serial.println("Setting up WiFi AP...");
-	if (WiFi.softAP("SetBot", "12345678")) {
+	if (WiFi.softAP("Zowxi", "12345678")) {
 		Serial.println("Wifi AP set up successfully");
 	}
 	WiFi.softAPConfig(IPAddress(192, 168, 4, 1), IPAddress(192, 168, 4, 1),

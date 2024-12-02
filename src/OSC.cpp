@@ -1,10 +1,3 @@
-/*
- * OSC.cpp
- *
- *  Created on: 02.10.2017
- *      Author: anonymous
- */
-
 #include "OSC.h"
 #include <WiFiUdp.h>
 #include "globals.h"

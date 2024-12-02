@@ -1,10 +1,3 @@
-/*
- * OSC.h
- *
- *  Created on: 02.10.2017
- *      Author: anonymous
- */
-
 #ifndef OSC_H_
 #define OSC_H_
 

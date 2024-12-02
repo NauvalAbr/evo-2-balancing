@@ -1,10 +1,3 @@
-/*
- * Motors.cpp
- *
- *  Created on: 25.09.2017
- *      Author: anonymous
- */
-
 #include <Arduino.h>
 #include <esp32-hal-timer.h>
 #include "defines.h"
